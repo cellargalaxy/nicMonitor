@@ -114,3 +114,5 @@ def xiaodou(msg):
 SyntaxError: (unicode error) 'utf-8' codec can't decode byte 0xcd in position 0: invalid continuation byte
 
 后来发现`'# -*- coding: utf-8 -*-`改为`# -*- coding: GBK -*-`就好了
+
+博客：[http://www.cellargalaxy.top/blog/article/5](http://www.cellargalaxy.top/blog/article/5 "Markdown")
