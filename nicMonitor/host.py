@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 
-DELATS_LEN = 5
-
+DELATS_LEN = 3
 
 class Host(object):
     '''
     交换机类
     '''
 
-    def __init__(self, address, area, floor, model, monitor, name=None, delaysLen=DELATS_LEN):
+    def __init__(self, address, building, floor, model, monitor, name=None, delaysLen=DELATS_LEN):
         self.address = address
-        self.area = area
+        self.building = building
         self.floor = floor
         self.model = model
         self.name = name
@@ -21,7 +20,7 @@ class Host(object):
 
     def __init__(self, hostMap, monitor, delaysLen=DELATS_LEN):
         self.address = hostMap['address']
-        self.area = hostMap['area']
+        self.building = hostMap['building']
         self.floor = hostMap['floor']
         self.model = hostMap['model']
         self.name = hostMap['name']
@@ -49,4 +48,7 @@ class Host(object):
 
     def print(self):
         print('address:%s area:%s floor:%s model:%s name:%s' % (
-            self.address, self.area, self.floor, self.model, self.name))
+            self.address, self.building, self.floor, self.model, self.name))
+
+
+# create table host (address varchar(255) primary key,building varchar(10) not null, floor varchar(10) not null, model varchar(255) not null, name varchar(255));

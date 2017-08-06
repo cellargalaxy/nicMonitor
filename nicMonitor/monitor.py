@@ -2,21 +2,24 @@
 import threading
 
 import time
-from json import JSONEncoder
 
-from wechat.handler import XiaoDouHandler
+from wechat.AliveTHread import AliveThread
+from wechat.handler import XiaoDouHandler, TestAliveHandler
 from wechat.robot import WxRobot
+from wechat.xiaodou import jsonHost
 
-qunName = '测试'
-qunName = '网络信息'
+qunName = '网管'
+
 
 class Monitor(threading.Thread):
-    def __init__(self, jsonString, sleepTime, friendHandlers, chatroomHandlers, checkTime):
+    def __init__(self, jsonString, sleepTime, friendHandlers, chatroomHandlers, checkTime, heartbeatFriendNames,
+                 heartbeatSleepTime):
         threading.Thread.__init__(self)
         self.lock = threading.Lock()
         from nicMonitor.campus import Campus
         self.campus = Campus(jsonString, self, sleepTime)
-        self.wxRobot = WxRobot(friendHandlers,chatroomHandlers)
+        self.wxRobot = WxRobot(friendHandlers, chatroomHandlers)
+        self.aliveThread = AliveThread(self.wxRobot, heartbeatFriendNames, heartbeatSleepTime)
         self.checkTime = checkTime
         self.runAble = True
         self.status = ''
@@ -24,6 +27,7 @@ class Monitor(threading.Thread):
     def run(self):
         self.wxRobot.start()
         self.campus.start()
+        self.aliveThread.start()
         time.sleep(60)
         while self.runAble:
             time.sleep(self.checkTime)
@@ -42,6 +46,7 @@ class Monitor(threading.Thread):
 
     def stop(self):
         self.runAble = False
+        self.aliveThread.stop()
         self.wxRobot.logout()
         self.campus.stop()
         print('退出监控和微信机器人')
@@ -51,25 +56,19 @@ class Monitor(threading.Thread):
         try:
             if host.status:
                 self.status += time.strftime("%m-%d %H:%M:%S",
-                                             time.localtime()) + ' 通 ' + host.area + '-' + host.floor + '-' + host.model + '-' + host.name + '\n'
+                                             time.localtime()) + ' 通 ' + host.building + '-' + host.floor + '-' + host.model + '-' + host.name + '\n'
             else:
                 self.status += time.strftime("%m-%d %H:%M:%S",
-                                             time.localtime()) + ' 挂 ' + host.area + '-' + host.floor + '-' + host.model + '-' + host.name + '\n'
+                                             time.localtime()) + ' 挂 ' + host.building + '-' + host.floor + '-' + host.model + '-' + host.name + '\n'
             print(host.address, '状态转：', host.status)
         finally:
             self.lock.release()
 
 
 if __name__ == '__main__':
-    o = [
-        {'address': '192.168.123.1', 'area': 'D1', 'floor': '319', 'model': 'abcd', 'name': '第1台'},
-        {'address': '114.114.114.114', 'area': 'D1', 'floor': '319', 'model': 'abcd', 'name': '第2台'},
-        {'address': 'baidu.com', 'area': 'D1', 'floor': '319', 'model': 'abcd', 'name': '第3台'},
-        {'address': '192.168.123.4', 'area': 'D1', 'floor': '319', 'model': 'abcd', 'name': '第4台'}
-    ]
-    jsonString = JSONEncoder().encode(o)
-    friendHandlers = []
+    friendHandlers = [TestAliveHandler()]
     chatroomHandlers = [XiaoDouHandler()]
+    heartbeatFriendNames = ['孵化种子']
 
-    monitor = Monitor(jsonString, 1, friendHandlers, chatroomHandlers, 10)
+    monitor = Monitor(jsonHost(), 1, friendHandlers, chatroomHandlers, 10, heartbeatFriendNames, 60 * 30)
     monitor.start()

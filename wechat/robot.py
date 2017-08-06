@@ -3,7 +3,7 @@ import threading
 from itchat import Core
 from itchat.content import *
 
-saveFilePath = '/home/cellargalaxy/wx/'
+saveFilePath = '/home/cellargalaxy/'
 
 
 class WxRobot(threading.Thread):

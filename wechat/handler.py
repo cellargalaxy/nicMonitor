@@ -31,3 +31,13 @@ class XiaoDouHandler(object):
 
     def handler(self, msg):
         return xiaodou(msg['Text'][3:])
+
+class TestAliveHandler(object):
+    def match(self, msg):
+        if msg['Text'].startswith('jjr'):
+            return True
+        else:
+            return False
+
+    def handler(self, msg):
+        return msg['Text']

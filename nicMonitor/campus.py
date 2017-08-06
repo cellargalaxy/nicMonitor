@@ -2,10 +2,9 @@
 
 import threading
 import time
-from json import JSONDecoder, JSONEncoder
+from json import JSONDecoder
 
 from nicMonitor.host import Host
-from nicMonitor.monitor import Monitor
 from nicMonitor.ping import ping
 
 
@@ -52,26 +51,3 @@ class Campus(threading.Thread):
                 self.hosts.append(Host(mapHost, monitor))
         finally:
             self.lock.release()
-
-
-
-
-
-if __name__ == '__main__':
-    o = [
-        {'address': '192.168.123.1', 'area': 'D1', 'floor': '319', 'model': 'abcd', 'name': '第1台'},
-        {'address': '114.114.114.114', 'area': 'D1', 'floor': '319', 'model': 'abcd', 'name': '第2台'},
-        {'address': 'baidu.com', 'area': 'D1', 'floor': '319', 'model': 'abcd', 'name': '第3台'},
-        {'address': '192.168.123.4', 'area': 'D1', 'floor': '319', 'model': 'abcd', 'name': '第4台'}
-    ]
-    string = JSONEncoder().encode(o)
-    monitor=Monitor()
-
-    campus = Campus(string, monitor, 1)
-    campus.start()
-    time.sleep(10)
-    campus.changeHosts(string, monitor)
-    print('change')
-    time.sleep(10)
-    campus.stop()
-    print('stop')
